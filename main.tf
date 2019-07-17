@@ -65,7 +65,7 @@ resource "aws_subnet" "private" {
 # NAT gateways
 
 resource "aws_eip" "nat" {
-  count = "${var.public_subnet_count}"
+  count = "${var.private_subnet_count}"
 
   tags = "${merge(var.default_tags, map(
     "Name", "${var.prefix_name}-nat-eip-${count.index}"
@@ -73,11 +73,10 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "gw" {
-  count = "${var.public_subnet_count}"
+  count = "${var.private_subnet_count}"
 
   allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
-
-  subnet_id = "${element(aws_subnet.public.*.id, count.index)}"
+  subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
 
   tags = "${merge(var.default_tags, map(
     "Name", "${var.prefix_name}-ngw-${count.index}"
